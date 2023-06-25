@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/QR_generator.iml" filepath="$PROJECT_DIR$/.idea/QR_generator.iml" />
+      <module fileurl="file://F:/OS_practical/.idea/pythonproject.iml" filepath="F:/OS_practical/.idea/pythonproject.iml" />
+    </modules>
+  </component>
+</project>
