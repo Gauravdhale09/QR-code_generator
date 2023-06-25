@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>QR Code Generator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f1f1f1;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 100vh;
+      padding: 0 120px;
+      box-sizing: border-box;
+    }
+
+    .form-container {
+      background-color: #ffffff;
+      padding: 10px;
+      margin : 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+      max-width: 600px;
+      height : 400px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+    }
+
+    .form-container h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .form-container label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .form-container input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      box-sizing: border-box;
+    }
+
+    .form-container .buttons {
+      display: flex;
+      align-items: center;
+    }
+
+    .form-container .buttons button {
+      background-color: #4CAF50;
+      color: #ffffff;
+      padding: 10px 30px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      flex: 1;
+      margin-right: 10px;
+    }
+
+    .form-container .buttons button[type="reset"] {
+      background-color: #f44336;
+      margin-right: 10px;
+    }
+
+    .form-container .buttons button[type="show-qr"] {
+      background-color: #4CAF50;
+    }
+
+    .empty-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: #ffffff;
+      height: 600px;
+      width: 600px;
+
+      padding: 0 70px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    }
+
+    .empty-container h3 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .empty-container .inner-box {
+      background-color: #ffffff;
+      height: 400px;
+      width: 100%;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+      margin-bottom: 20px;
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-position: center;
+      padding: 20px 0;
+    }
+
+    .empty-container button {
+      background-color: #4CAF50;
+      color: #ffffff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .empty-container button[type="download"] {
+      background-color: #4CAF50;
+    }
+    .form-container .buttons .download:disabled{
+      background-color: gray;
+      cursor : not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="form-container">
+      <h2>QR Code Generator</h2>
+      <form>
+        <label for="website">Website Link:</label>
+        <input type="text" id="website" name="website" placeholder="Enter the website link">
+
+        <label for="qrName">QR Code Name:</label>
+        <input type="text" id="qrName" name="qrName" placeholder="Enter the QR code name">
+        <div class="buttons">
+          <button type="submit" id="but1" onclick="post()">Generate QR Code</button>
+          <button type="reset">Reset</button>
+          <button type="button" class="show-qr">Show QR</button>
+        </div>
+      </form>
+    </div>
+    <div class="empty-container">
+      <h3>Your QR here</h3>
+      <div class="inner-box"></div>
+      <button type="button" class="download" onclick="downloadOutput()">Download QR Code</button>
+    </div>
+  </div>
+  <script>
+    var link_post = document.getElementById("website");
+    var name_post = document.getElementById("qrName");
+    var gen_butt = document.querySelector("#but1");
+    var down_butt = document.querySelector(".show-qr");
+    var show_butt = document.querySelector(".download");
+    show_butt.enabled = false;
+
+    function post(){
+      function stateHandle() {
+        if (link_post.value.trim() == '') {
+            gen_butt.disabled = true;
+        }
+        else {
+            gen_butt.disabled = false;
+        }
+      }
+      link_post.addEventListener('input', stateHandle);
+      var link_here = link_post.value;
+      var name_here = name_post.value;
+      var formData = new FormData();
+      formData.append('link_get', link_here);
+      formData.append('name_get', name_here);
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", "/get-link", true);
+      xhr.send(formData);
+      xhr.open('GET', '/get-alert-message', true);
+            xhr.onload = function() {
+                if (this.status == 200) {
+                    var response = JSON.parse(this.responseText);
+                    var message = response.message;
+                    alert(message);
+                }
+            };
+            xhr.send();
+    }
+    down_butt.addEventListener("click", displayImage);
+    function displayImage() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/image', true);
+        xhr.responseType = 'blob';
+        xhr.onload = function () {
+            if (this.status === 200) {
+                var blob = this.response;
+                var url = URL.createObjectURL(blob);
+                document.querySelector(".inner-box").style.backgroundImage = `url(${url})`;
+                show_butt.enabled = true;
+            }
+        };
+        xhr.send();
+    }
+    function downloadOutput(){
+      window.location.href = "/download-output";
+    }
+
+  </script>
+</body>
+</html>
