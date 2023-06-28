@@ -55,7 +55,8 @@ def get_alert_message():
 
 @app.route('/image')
 def get_image():
-    filename = 'E:\\MAIN\\PycharmProjects\\QR_generator\\' + file_location
+
+    filename = file_location
     print(filename)
     return send_file(filename, mimetype='image/png')
 
